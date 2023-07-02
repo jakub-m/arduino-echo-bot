@@ -6,9 +6,9 @@
  */
 typedef long interval;
 
-#define INTERVAL_US (1)
-#define INTERVAL_MS (1000 * INTERVAL_US)
-#define INTERVAL_SEC (1000 * INTERVAL_MS)
+#define INTERVAL_MICROS (1L)
+#define INTERVAL_MILLIS (1000L * INTERVAL_MICROS)
+#define INTERVAL_SEC (1000L * INTERVAL_MILLIS)
 
 /**
  * Return interval as milliseconds.

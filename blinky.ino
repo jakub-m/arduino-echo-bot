@@ -61,7 +61,7 @@ void measure_distance_async(struct distance_measurement *dm)
         }
         else
         {
-            int max_wait_time = 10 * INTERVAL_MS;
+            int max_wait_time = 10 * INTERVAL_MILLIS;
             // Break measurement when the puls never came back.
             if (dt_micros > interval_micros(max_wait_time))
             {
@@ -94,9 +94,9 @@ void trigger_echo()
 {
     di.trigger_count++;
     digitalWrite(trig_pin, LOW);
-    delayMicroseconds(interval_micros(2 * INTERVAL_US));
+    delayMicroseconds(interval_micros(2 * INTERVAL_MICROS));
     digitalWrite(trig_pin, HIGH);
-    delayMicroseconds(interval_micros(10 * INTERVAL_US));
+    delayMicroseconds(interval_micros(10 * INTERVAL_MICROS));
     digitalWrite(trig_pin, LOW);
 }
 
@@ -114,24 +114,27 @@ void setup()
 
 void loop()
 {
-    unsigned long now = millis();
-    measure_distance_async(&dm);
-    if (now > next_report)
-    {
-        Serial.print("distance cm ");
-        Serial.println(dm.distance_cm);
-        Serial.print("trigger count ");
-        Serial.println(di.trigger_count);
-        Serial.print("timeout ");
-        Serial.println(di.echo_timeout);
-        Serial.print("start time ");
-        Serial.println(dm.start_micros);
-        // Serial.println(300);
-        next_report = now + interval_millis(1 * INTERVAL_SEC);
-        toggle_led();
-    }
+    // unsigned long now = millis();
+    // measure_distance_async(&dm);
+    // if (now > next_report)
+    // {
+    // Serial.print("distance cm ");
+    // Serial.println(dm.distance_cm);
+    // Serial.print("trigger count ");
+    // Serial.println(di.trigger_count);
+    // Serial.print("timeout ");
+    // Serial.println(di.echo_timeout);
+    // Serial.print("start time ");
+    // Serial.println(dm.start_micros);
+    // next_report = now + interval_millis(1 * INTERVAL_SEC);
+    // toggle_led();
+    // }
 
-    //    float distanceCm = measure_distance_cm();
-    //    Serial.println(distanceCm);
-    //    delay(interval_millis(300 * ms));
+    trigger_echo();
+    Serial.println("trigger");
+    unsigned long dt = pulseIn(echo_pin, HIGH);
+    Serial.print("pulse ");
+    Serial.println(dt);
+    delay(interval_millis(300 * INTERVAL_MILLIS));
+    Serial.println("done delay");
 }
