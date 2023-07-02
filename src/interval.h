@@ -20,16 +20,4 @@ long interval_millis(interval dt);
  */
 long interval_micros(interval dt);
 
-#include "interval.c"
-
-inline long interval_millis(interval dt)
-{
-    return dt / INTERVAL_MS;
-}
-
-inline long interval_micros(interval dt)
-{
-    return dt / INTERVAL_US;
-}
-
 #endif // __INTERVAL_H__

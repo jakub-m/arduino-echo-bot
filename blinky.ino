@@ -1,4 +1,5 @@
 #include "src/interval.h"
+#include "src/interval.c"
 
 typedef uint8_t pin;
 
