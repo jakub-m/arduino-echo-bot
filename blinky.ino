@@ -25,11 +25,12 @@ void toggle_led()
 struct distance_measurement
 {
     // Start of the measurement, elapsed microseconds.
-    unsigned long start_micros;
+    // unsigned long start_micros;
     // Last measurement in cm.
     float distance_cm;
     // Is there a measurement in flight?
     bool in_flight;
+    struct pulse_measurement pulse;
 };
 
 struct debug_info
@@ -47,37 +48,42 @@ void measure_distance_async(struct distance_measurement *dm)
 {
     if (dm->in_flight)
     {
-        if (digitalRead(echo_pin) == LOW)
+        measure_pulse_async(&dm->pulse, echo_pin, HIGH);
+        if (dm->pulse.width_micros != 0)
         {
-            unsigned long now_micros = micros();
             dm->in_flight = false;
-            unsigned long dt_micros = now_micros - dm->start_micros;
-            // Speed of sound is .0343 c/uS, which is 34.3 cm per mS
-            dm->distance_cm = 0.0343 * dt_micros / 2;
+            dm->distance_cm = dm->pulse.width_micros;
+            delay(500);
+            Serial.println(dm->pulse.width_micros);
         }
-        else
-        {
-            // Potential BUG. Will freeze if the measurement never ends.
-
-            //     int max_wait_time = 10 * INTERVAL_MILLIS;
-            //     // Break measurement when the puls never came back.
-            //     if (dt_micros > interval_micros(max_wait_time))
-            //     {
-            //         di.echo_timeout++;
-            //         dm->in_flight = false;
-            //     }
-        }
+        //        if (digitalRead(echo_pin) == LOW)
+        //        {
+        //            unsigned long now_micros = micros();
+        //            dm->in_flight = false;
+        //            unsigned long dt_micros = now_micros - dm->start_micros;
+        //            // Speed of sound is .0343 c/uS, which is 34.3 cm per mS
+        //            dm->distance_cm = 0.0343 * dt_micros / 2;
+        //        }
+        //        else
+        //        {
+        //            // Potential BUG. Will freeze if the measurement never ends.
+        //
+        //            //     int max_wait_time = 10 * INTERVAL_MILLIS;
+        //            //     // Break measurement when the puls never came back.
+        //            //     if (dt_micros > interval_micros(max_wait_time))
+        //            //     {
+        //            //         di.echo_timeout++;
+        //            //         dm->in_flight = false;
+        //            //     }
+        //        }
     }
     else
     {
         // No measurement in flight, trigger one.
-        dm->start_micros = micros();
+        // dm->start_micros = micros();
         dm->in_flight = true;
+        dm->pulse = (struct pulse_measurement){};
         trigger_echo();
-        while (digitalRead(echo_pin) != HIGH)
-        {
-            // Wait for echo to go high.  Potential BUG. Will freeze if the pin never turns low, or turns low immediately.
-        }
     }
 }
 
@@ -108,29 +114,25 @@ void setup()
     pinMode(trig_pin, OUTPUT);
     pinMode(echo_pin, INPUT);
     Serial.begin(9600);
-    dm.distance_cm = 0;
-    dm.in_flight = false;
-    di.trigger_count = 0;
-    di.echo_timeout = 0;
 }
 
 void loop()
 {
-    unsigned long now = millis();
+    // unsigned long now = millis();
     measure_distance_async(&dm);
-    if (now > next_report)
-    {
-        Serial.print("distance cm ");
-        Serial.print(dm.distance_cm);
-        Serial.print(" trigger count ");
-        Serial.print(di.trigger_count);
-        Serial.print(" timeout ");
-        Serial.print(di.echo_timeout);
-        Serial.print(" start time ");
-        Serial.println(dm.start_micros);
-        next_report = now + interval_millis(1 * INTERVAL_SEC);
-        // toggle_led();
-    }
+    // if (now > next_report)
+    // {
+    // Serial.print("distance cm ");
+    // Serial.print(dm.distance_cm);
+    // Serial.print(" trigger count ");
+    // Serial.print(di.trigger_count);
+    // Serial.print(" timeout ");
+    // Serial.print(di.echo_timeout);
+    // Serial.print(" start time ");
+    // Serial.println(dm.start_micros);
+    // next_report = now + interval_millis(1 * INTERVAL_SEC);
+    // toggle_led();
+    // }
 
     // trigger_echo();
     // Serial.println("trigger");

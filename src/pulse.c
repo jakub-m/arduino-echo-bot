@@ -6,17 +6,16 @@
  */
 void measure_pulse_async(struct pulse_measurement *pm, uint8_t pin, uint8_t state)
 {
-    if (pm->pulse_started_at_millis != 0 && pm->width_millis != 0)
+    if (pm->pulse_started_at_micros != 0 && pm->width_micros != 0)
     {
         return;
     }
     uint8_t actual = digitalRead(pin);
-    if (pm->pulse_started_at_millis == 0)
+    if (pm->pulse_started_at_micros == 0)
     {
         if (actual == state)
         {
-            unsigned long now = millis();
-            pm->pulse_started_at_millis = now;
+            pm->pulse_started_at_micros = micros();
         }
         else
         {
@@ -31,8 +30,7 @@ void measure_pulse_async(struct pulse_measurement *pm, uint8_t pin, uint8_t stat
         }
         else
         {
-            unsigned long now = millis();
-            pm->width_millis = now - pm->pulse_started_at_millis;
+            pm->width_micros = micros() - pm->pulse_started_at_micros;
         }
     }
 }

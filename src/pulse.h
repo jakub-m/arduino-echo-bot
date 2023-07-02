@@ -3,8 +3,8 @@
 
 struct pulse_measurement
 {
-    unsigned long pulse_started_at_millis;
-    unsigned long width_millis;
+    unsigned long pulse_started_at_micros;
+    unsigned long width_micros;
 };
 
 #endif // __PULSE_H__
