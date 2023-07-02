@@ -47,28 +47,27 @@ void measure_distance_async(struct distance_measurement *dm)
     if (dm->in_flight)
     {
         unsigned long pulse = pulseIn(echo_pin, HIGH); // remove this, do it on my own
-        unsigned long dt_micros = now_micros - dm->start_micros;
-        Serial.print("pulse ");
+        Serial.print(" pulse ");
         Serial.println(pulse);
-        Serial.print("dt_micros ");
-        Serial.println(dt_micros);
+        // unsigned long dt_micros = now_micros - dm->start_micros;
+        unsigned long dt_micros = pulse;
 
-        if (digitalRead(echo_pin) == HIGH)
+        // if (digitalRead(echo_pin) == HIGH)
         {
             dm->in_flight = false;
             // Speed of sound is .0343 c/uS, which is 34.3 cm per mS
             dm->distance_cm = 0.0343 * dt_micros / 2;
         }
-        else
-        {
-            int max_wait_time = 10 * INTERVAL_MILLIS;
-            // Break measurement when the puls never came back.
-            if (dt_micros > interval_micros(max_wait_time))
-            {
-                di.echo_timeout++;
-                dm->in_flight = false;
-            }
-        }
+        // else
+        // {
+        //     int max_wait_time = 10 * INTERVAL_MILLIS;
+        //     // Break measurement when the puls never came back.
+        //     if (dt_micros > interval_micros(max_wait_time))
+        //     {
+        //         di.echo_timeout++;
+        //         dm->in_flight = false;
+        //     }
+        // }
     }
     else
     {
@@ -114,27 +113,27 @@ void setup()
 
 void loop()
 {
-    // unsigned long now = millis();
-    // measure_distance_async(&dm);
-    // if (now > next_report)
-    // {
-    // Serial.print("distance cm ");
-    // Serial.println(dm.distance_cm);
-    // Serial.print("trigger count ");
-    // Serial.println(di.trigger_count);
-    // Serial.print("timeout ");
-    // Serial.println(di.echo_timeout);
-    // Serial.print("start time ");
-    // Serial.println(dm.start_micros);
-    // next_report = now + interval_millis(1 * INTERVAL_SEC);
-    // toggle_led();
-    // }
+    unsigned long now = millis();
+    measure_distance_async(&dm);
+    if (now > next_report)
+    {
+        Serial.print("distance cm ");
+        Serial.print(dm.distance_cm);
+        Serial.print(" trigger count ");
+        Serial.print(di.trigger_count);
+        Serial.print(" timeout ");
+        Serial.print(di.echo_timeout);
+        Serial.print(" start time ");
+        Serial.println(dm.start_micros);
+        next_report = now + interval_millis(1 * INTERVAL_SEC);
+        // toggle_led();
+    }
 
-    trigger_echo();
-    Serial.println("trigger");
-    unsigned long dt = pulseIn(echo_pin, HIGH);
-    Serial.print("pulse ");
-    Serial.println(dt);
-    delay(interval_millis(300 * INTERVAL_MILLIS));
-    Serial.println("done delay");
+    // trigger_echo();
+    // Serial.println("trigger");
+    // unsigned long dt = pulseIn(echo_pin, HIGH);
+    // Serial.print("pulse ");
+    // Serial.println(dt);
+    // delay(interval_millis(300 * INTERVAL_MILLIS));
+    // Serial.println("done delay");
 }
