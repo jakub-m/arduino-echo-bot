@@ -26,10 +26,11 @@ void measure_pulse_async(struct pulse_measurement *pm, uint8_t pin, uint8_t stat
     {
         if (actual == state)
         {
-            // Pulse stll in progress.
+            // Pulse still in progress.
         }
         else
         {
+            // Potential BUG. Width can overflow, add deadline.
             pm->width_micros = micros() - pm->pulse_started_at_micros;
         }
     }
